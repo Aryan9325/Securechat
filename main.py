@@ -8,7 +8,7 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 # Your encryption key
-secret_key = "YOUR_SECRET_KEY"
+secret_key = "YOUR_SECRET_KEY"  # Replace with your actual secret key
 fernet = Fernet(secret_key)
 
 # Basic route to check if it's working
@@ -18,24 +18,4 @@ def index():
 
 # Starting the server with Gunicorn for production
 if __name__ == '__main__':
-    from gunicorn.app.base import BaseApplication
-    from gunicorn.six import iteritems
-
-    class FlaskGunicornApplication(BaseApplication):
-        def __init__(self, app, options=None):
-            self.options = options or {}
-            self.app = app
-            super().__init__()
-
-        def load(self):
-            return self.app
-
-        def load_config(self):
-            for key, value in iteritems(self.options):
-                self.cfg.set(key, value)
-
-    options = {
-        'bind': '0.0.0.0:5000',  # The host and port to bind the server to
-    }
-    FlaskGunicornApplication(app, options).run()
-    
+    socketio.run(app, host='0.0.0.0', port=5000)
