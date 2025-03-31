@@ -19,5 +19,27 @@ def handle_message(encrypted_msg):
     send(encrypted_msg)  # Forward encrypted message to all clients
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000)
+if __name__ == '__main__':
+    # Run the app using gunicorn in production environment
+    from gunicorn.app.base import BaseApplication
+    from gunicorn.six import iteritems
+
+    class FlaskGunicornApplication(BaseApplication):
+        def __init__(self, app, options=None):
+            self.options = options or {}
+            self.app = app
+            super().__init__()
+
+        def load(self):
+            return self.app
+
+        def load_config(self):
+            for key, value in iteritems(self.options):
+                self.cfg.set(key, value)
+
+    options = {
+        'bind': '0.0.0.0:5000',  # The host and port to bind the server to
+    }
+    FlaskGunicornApplication(app, options).run()
+
     
