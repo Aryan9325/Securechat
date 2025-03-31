@@ -1,26 +1,23 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO, send
+from flask import Flask
+from flask_socketio import SocketIO
 from cryptography.fernet import Fernet
+import os
 
+# Initialize the Flask application and SocketIO
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-# Generate a secret key for encryption
-SECRET_KEY = b'ctv1GpJD_gfZAxdFe8aKJwTi0fHDUjn-dbO6tdvQAfE='  # Replace with actual key
-cipher = Fernet(SECRET_KEY)
+# Your encryption key
+secret_key = "YOUR_SECRET_KEY"
+fernet = Fernet(secret_key)
 
+# Basic route to check if it's working
 @app.route('/')
 def index():
-    return render_template('chat.html')
+    return "SecureChat App is Running"
 
-@socketio.on('message')
-def handle_message(encrypted_msg):
-    send(encrypted_msg)  # Forward encrypted message to all clients
-
+# Starting the server with Gunicorn for production
 if __name__ == '__main__':
-if __name__ == '__main__':
-    # Run the app using gunicorn in production environment
     from gunicorn.app.base import BaseApplication
     from gunicorn.six import iteritems
 
@@ -41,5 +38,4 @@ if __name__ == '__main__':
         'bind': '0.0.0.0:5000',  # The host and port to bind the server to
     }
     FlaskGunicornApplication(app, options).run()
-
     
