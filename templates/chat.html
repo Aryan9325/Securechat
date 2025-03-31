@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encrypted Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <h2>Encrypted Chat</h2>
+    <ul id="messages"></ul>
+    <input id="message" type="text" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        var socket = io();
+        const SECRET_KEY = "b'ctv1GpJD_gfZAxdFe8aKJwTi0fHDUjn-dbO6tdvQAfE=";  // Replace with actual key
+
+        socket.on('message', function(encrypted_msg) {
+            var decrypted_msg = CryptoJS.AES.decrypt(encrypted_msg, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+            var listItem = document.createElement('li');
+            listItem.textContent = decrypted_msg;
+            document.getElementById('messages').appendChild(listItem);
+        });
+
+        function sendMessage() {
+            var message = document.getElementById('message').value;
+            var encrypted_msg = CryptoJS.AES.encrypt(message, SECRET_KEY).toString();
+            socket.send(encrypted_msg);
+            document.getElementById('message').value = '';
+        }
+    </script>
+</body>
+</html>
